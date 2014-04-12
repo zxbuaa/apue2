@@ -130,8 +130,18 @@ char *my_ttyname(int fd)
 int main(int argc, char *argv[])
 {
 	char *name;
+	char buf[PATH_MAX];
+	int ret;
+
 	name = my_ttyname(STDIN_FILENO);
 	printf("%s\n", name != NULL ? name : "<NULL>");
+
+	name = ttyname(STDIN_FILENO);
+	printf("%s\n", name != NULL ? name : "<NULL>");
+
+	ret = ttyname_r(STDIN_FILENO, buf, sizeof(buf));
+	printf("%s\n", ret == 0 ? buf : "<NULL>");
+
 	return 0;
 }
 
