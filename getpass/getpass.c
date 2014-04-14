@@ -13,6 +13,7 @@ char *my_getpass(const char *promp)
 	int fd;
 	static char buf[MAX_PASS_LEN + 1]; /* len + '\n' */
 	int len;
+	int rlen;
 	char *bufp;
 	sigset_t sig, osig;
 	struct termios ts, ots;
@@ -37,16 +38,22 @@ char *my_getpass(const char *promp)
 
 	fprintf(stderr, "%s", promp);
 	/* read a line */
-	if ((len = read(fd, buf, sizeof(buf))) == 0) {
-		bufp = NULL;
-		goto restore;
+	len = 0;
+	while ((rlen = read(fd, buf + len, sizeof(buf) - len)) != 0) {
+		len += rlen;
+		if (buf[len -1 ] == '\n') {
+			break;
+		}
+	}
+	if (len == 0) {
+		buf[0] = '\0';
 	} else {
-		bufp = buf;
 		if (buf[len - 1] == '\n') {
 			buf[len - 1] = '\0'; /* replace '\n' with '\0' */
 		}
 		buf[MAX_PASS_LEN] = '\0';
 	}
+	bufp = buf;
 	fprintf(stderr, "\n");
 	tcdrain(STDERR_FILENO);
 
@@ -90,7 +97,8 @@ char *my_getpass2(const char *promp)
 	fprintf(stderr, "%s", promp);
 	/* read a line */
 	if ((bufp = fgets(buf, sizeof(buf), fp)) == NULL) {
-		goto restore;
+		buf[0] = '\0';
+		bufp = buf;
 	} else {
 		int len = strlen(bufp);
 		if (bufp[len - 1] == '\n') {

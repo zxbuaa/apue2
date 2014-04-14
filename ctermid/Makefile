@@ -1,4 +1,4 @@
 all: ctermid
 ctermid: ctermid.o
 clean:
-	rm ctermid *.o
+	rm -f ctermid *.o

@@ -1,4 +1,4 @@
 all: getpass
 getpass: getpass.o
 clean:
-	rm getpass *.o
+	rm -f getpass *.o
